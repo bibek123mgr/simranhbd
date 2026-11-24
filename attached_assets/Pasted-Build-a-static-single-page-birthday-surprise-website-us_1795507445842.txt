@@ -1,0 +1,67 @@
+Build a static, single-page birthday surprise website using only HTML, CSS, and vanilla JavaScript. No backend, no frameworks, no database. It should be a multi-step experience where each step fades or slides into the next. Mobile-first and fully responsive.
+
+Put ALL personal data in one CONFIG object at the top of script.js so I can easily replace it:
+
+const CONFIG = {
+  name: "Simran",
+  birthdayDate: "2026-12-15T00:00:00",
+  introText: "Something special is waiting for Simran...",
+  wishPrompt: "Make a wish, then tap the candle 🎂",
+  photos: [
+    { src: "images/photo1.jpg", caption: "Our first trip together 🌴" },
+    { src: "images/photo2.jpg", caption: "That crazy night out 😂" },
+    { src: "images/photo3.jpg", caption: "My favorite smile 😊" },
+    { src: "images/photo4.jpg", caption: "Best day ever ❤️" },
+    { src: "images/photo5.jpg", caption: "Forever friends 🤝" }
+  ],
+  message: "Dear Simran,\n\nToday is all about you. Thank you for being the kindest, funniest and most amazing person in my life. Every moment with you turns into a beautiful memory. I hope this year brings you endless smiles, big dreams coming true, and all the happiness you deserve.\n\nYou mean the world to me. ❤️",
+  finalTitle: "Happy Birthday Simran! 🎉",
+  finalWish: "May all your wishes come true. Keep shining, keep smiling, and never stop being you. Love you always! 💖",
+  sounds: {
+    background: "audio/birthday.mp3",
+    pop: "audio/pop.mp3",
+    celebration: "audio/celebration.mp3"
+  }
+};
+
+THEME: Dark navy/purple gradient background, soft glowing gold and pink accents, floating balloons and twinkling stars in the background. Google Fonts: "Poppins" for body, "Pacifico" for headings.
+
+STEP 1 - COUNTDOWN
+- Full-screen intro showing introText and a big animated countdown (days, hours, minutes, seconds) to CONFIG.birthdayDate.
+- A glowing "Tap to Start 🎁" button. This tap unlocks audio and starts soft background music.
+- When the countdown reaches zero, or the button is tapped, smoothly go to Step 2.
+
+STEP 2 - CAKE AND CANDLE (interactive)
+- Draw a cute layered cake with CSS/SVG and a candle with an animated flickering flame. Show CONFIG.wishPrompt.
+- On candle tap: the flame goes out with a puff of smoke, play the pop sound, trigger a confetti burst, and make the cake bounce.
+- Bonus: also allow blowing into the mic to extinguish it, with tap as a fallback.
+- After the flame is out, show a pulsing "Next ➜" button.
+
+STEP 3 - PHOTO MEMORIES
+- Build the gallery from CONFIG.photos.
+- Polaroid-style cards with slight random rotation, a tape effect on top, and handwritten captions (use the "Caveat" Google Font).
+- Cards animate in one by one (staggered fade and slide). On mobile, make it a swipeable carousel.
+- Tapping a photo opens it in a lightbox.
+- If an image file is missing, show a colorful placeholder so the page never looks broken.
+- "Next ➜" button at the end.
+
+STEP 4 - MESSAGE
+- A glassmorphism card with a typewriter effect that types CONFIG.message letter by letter (respect line breaks) with a blinking cursor.
+- Floating hearts rising in the background.
+- Show a "Next ➜" button after typing finishes.
+
+STEP 5 - FINAL WISH
+- Large glowing, shimmering gradient text with CONFIG.finalTitle.
+- CONFIG.finalWish fades in below it.
+- Canvas fireworks plus continuous confetti rain.
+- Play the celebration sound and raise the background music volume.
+- A "Replay 🔁" button restarts from Step 1.
+
+TECHNICAL REQUIREMENTS:
+- Files: index.html, style.css, script.js, plus folders images/ and audio/.
+- Each step is a <section class="step"> shown one at a time through a showStep(n) function with smooth transitions.
+- A mute/unmute button fixed in the top corner.
+- Preload images and audio.
+- If audio files are missing, fail silently with no console crashes.
+- Add clear comments showing where to change text, photos, and sounds.
+- Pure static site, no backend or API calls, deployable as a Static Deployment on Replit.

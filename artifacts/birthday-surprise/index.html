@@ -15,6 +15,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Pacifico&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
     <script type="module" src="/script.js"></script>
+    <script type="module" src="/countdown.js"></script>
+
   </head>
   <body>
     <div class="sky" aria-hidden="true">
@@ -57,24 +59,13 @@
             <p class="eyebrow">A little something, just for you</p>
             <h1 class="intro-title" id="intro-title" tabindex="-1"></h1>
             <p class="intro-subtitle" id="intro-subtitle">The best day deserves a little bit of magic.</p>
+                        <!-- BIRTHDAY COUNTDOWN -->
             <div class="countdown" id="countdown" aria-label="Birthday countdown">
               <div class="time-unit"><span class="time-value" id="count-days">00</span><span class="time-label">Days</span></div>
               <div class="time-unit"><span class="time-value" id="count-hours">00</span><span class="time-label">Hours</span></div>
               <div class="time-unit"><span class="time-value" id="count-minutes">00</span><span class="time-label">Minutes</span></div>
               <div class="time-unit"><span class="time-value" id="count-seconds">00</span><span class="time-label">Seconds</span></div>
             </div>
-            <form class="birthday-puzzle" id="birthday-puzzle" hidden>
-              <p class="puzzle-kicker">A little birthday puzzle</p>
-              <h2 class="puzzle-title">Unscramble the word</h2>
-              <p class="puzzle-instructions">Solve this birthday word to unlock the surprise.</p>
-              <p class="scrambled-word" id="scrambled-word"></p>
-              <label class="puzzle-label" for="puzzle-answer">Your answer</label>
-              <div class="puzzle-controls">
-                <input id="puzzle-answer" name="answer" type="text" autocomplete="off" autocapitalize="none" required>
-                <button class="puzzle-submit" id="puzzle-submit" type="submit">Check answer</button>
-              </div>
-              <p class="puzzle-feedback" id="puzzle-feedback" role="status" aria-live="polite"></p>
-            </form>
             <button class="primary-button" id="start-button" type="button">Tap to Start</button>
             <p class="quiet-note">Turn your volume up, then tap to start the birthday tune.</p>
           </div>
@@ -114,11 +105,7 @@
             <p class="eyebrow">Little moments, kept close</p>
             <h2 class="section-title" id="memories-title" tabindex="-1">A few favorite memories</h2>
             <p class="section-subtitle">A little collection of days worth keeping.</p>
-            <div class="upload-panel">
-              <label class="upload-button" for="memory-upload">Add photos or videos</label>
-              <input class="sr-only" id="memory-upload" type="file" accept="image/*,video/*" multiple>
-              <p class="upload-note">Your selected files are temporary previews in this browser only. They disappear on refresh and are not shared with other visitors.</p>
-            </div>
+         
             <div class="memory-rail" id="memory-rail" aria-label="Photo and video memories"></div>
             <p class="gallery-tip">Swipe to wander through the memories.</p>
             <div class="gallery-controls" aria-label="Gallery controls">

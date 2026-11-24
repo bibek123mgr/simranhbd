@@ -1,29 +1,21 @@
 const CONFIG = {
   // Personalize every line here; the site remains a self-contained static experience.
-  name: "Priya",
+  name: "Simran",
   birthdayDate: "2026-10-25T00:00:00",
-  introText: "Something special is waiting for Priya...",
+  introText: "Something special is waiting for Simran...",
   introSubtitle: "The best day deserves a little bit of magic.",
   birthdayTodaySubtitle: "It's your birthday today. Your surprise is ready whenever you are.",
   birthdayPassedSubtitle: "The date has passed, but your birthday surprise is still here.",
-  birthdayPuzzle: {
-    scrambledWord: "YADHTRIB",
-    answer: "BIRTHDAY",
-    retryMessage: "Not quite. Try rearranging the letters.",
-    successMessage: "You solved it. Your surprise is ready!",
-    unlockButton: "Open your surprise"
-  },
   wishPrompt: "Make a wish, then tap the candle.",
   candleRevealText: "One wish made. One wonderful year ahead.",
   photos: [
-    { src: "images/photo1.jpg", caption: "Our first trip together" },
-    { src: "images/photo2.jpg", caption: "That crazy night out" },
-    { src: "images/photo3.jpg", caption: "My favorite smile" },
-    { src: "images/photo4.jpg", caption: "Best day ever" },
-    { src: "images/photo5.jpg", caption: "Forever friends" }
+    { src: "images/photo6.jpg", caption: "My favorite eye" },
+    { src: "images/photo2.jpg", caption: "My Favorite Smile With Rose" },
+    { src: "images/photo3.jpg", caption: "v Favorite Smile" },
+    { src: "images/photo4.jpg", caption: "Love trend" },
+    { src: "images/photo5.jpg", caption: "Cheese" }
   ],
-  message: "Dear Priya,\n\nToday is all about you. Thank you for being the kindest, funniest and most amazing person in my life. Every moment with you turns into a beautiful memory. I hope this year brings you endless smiles, big dreams coming true, and all the happiness you deserve.\n\nYou mean the world to me.",
-  // Content for the two added pages is editable here.
+  message: "Dear Simran,\n\nToday is all about you. Thank you for being the kindest, funniest and most amazing person in my life. Every moment with you turns into a beautiful memory. I hope this year brings you endless smiles, big dreams coming true, and all the happiness you deserve.\n\nYou mean the world to me.",
   loveNotes: {
     eyebrow: "The little things",
     title: "Little things we love about you",
@@ -46,10 +38,8 @@ const CONFIG = {
       "A little magic in the ordinary days."
     ]
   },
-  finalTitle: "Happy Birthday Priya!",
+  finalTitle: "Happy Birthday Simran!",
   finalWish: "May all your wishes come true. Keep shining, keep smiling, and never stop being you. Love you always!",
-  // Leave background empty to use the built-in Happy Birthday melody.
-  // Add an audio file path here only if you want to replace that melody.
   sounds: {
     background: "",
     pop: "",
@@ -67,10 +57,6 @@ const CONFIG = {
   const finalTitle = $("#final-title");
   const finalWish = $("#final-wish");
   const startButton = $("#start-button");
-  const birthdayPuzzle = $("#birthday-puzzle");
-  const puzzleAnswer = $("#puzzle-answer");
-  const puzzleSubmit = $("#puzzle-submit");
-  const puzzleFeedback = $("#puzzle-feedback");
   const cakeStage = $("#cake-stage");
   const candleButton = $("#candle-button");
   const cake = $("#cake");
@@ -91,6 +77,7 @@ const CONFIG = {
   const canvas = $("#celebration-canvas");
   const context = canvas.getContext("2d");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  
   const placeholderColors = [
     "linear-gradient(145deg, #ffd9e6, #f6a5c7)",
     "linear-gradient(145deg, #ffe6a9, #f2a9bb)",
@@ -98,12 +85,12 @@ const CONFIG = {
     "linear-gradient(145deg, #f6c5d4, #f39c9d)",
     "linear-gradient(145deg, #f5d8a7, #ec9ebc)"
   ];
+  
   let currentStep = 1;
   let countdownInterval;
   let typewriterInterval;
   let isMuted = false;
   let flameIsOut = false;
-  let puzzleSolved = false;
   let lightboxReturnFocus = null;
   let canvasFrame = null;
   let lastFireworkAt = 0;
@@ -116,6 +103,7 @@ const CONFIG = {
   let melodyStarted = false;
   let melodyIndex = 0;
   let nextNoteAt = 0;
+  
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const melody = [
     [392, .27], [392, .27], [440, .54], [392, .54], [523.25, .54], [493.88, 1.05],
@@ -123,6 +111,7 @@ const CONFIG = {
     [392, .27], [392, .27], [783.99, .54], [659.25, .54], [523.25, .54], [493.88, .54], [440, 1.05],
     [698.46, .27], [698.46, .27], [659.25, .54], [523.25, .54], [587.33, .54], [523.25, 1.1]
   ];
+  
   const audioTracks = {};
   Object.entries(CONFIG.sounds || {}).forEach(([key, source]) => {
     if (!source) return;
@@ -220,7 +209,6 @@ const CONFIG = {
 
     if (today === birthdayDay) {
       countdown.hidden = true;
-      birthdayPuzzle.hidden = true;
       startButton.hidden = false;
       startButton.textContent = "Tap to Start";
       introSubtitle.textContent = CONFIG.birthdayTodaySubtitle;
@@ -229,15 +217,13 @@ const CONFIG = {
 
     if (today > birthdayDay) {
       countdown.hidden = true;
-      birthdayPuzzle.hidden = false;
-      startButton.hidden = !puzzleSolved;
-      startButton.textContent = CONFIG.birthdayPuzzle.unlockButton;
+      startButton.hidden = false;
+      startButton.textContent = "Tap to Start";
       introSubtitle.textContent = CONFIG.birthdayPassedSubtitle;
       return;
     }
 
     countdown.hidden = false;
-    birthdayPuzzle.hidden = true;
     startButton.hidden = false;
     startButton.textContent = "Tap to Start";
     introSubtitle.textContent = CONFIG.introSubtitle;
@@ -254,6 +240,7 @@ const CONFIG = {
       if (output) output.textContent = String(value).padStart(2, "0");
     });
   }
+  
   function showStep(number) {
     if (number < 1 || number > totalSteps) return;
     currentStep = number;
@@ -272,40 +259,16 @@ const CONFIG = {
     if (number === totalSteps) beginCelebration();
     else stopCelebration();
   }
+  
   function startFromBeginning() {
-    if (isBirthdayPast() && !puzzleSolved) return;
     startMusicFromGesture();
     if (currentStep === 1) showStep(2);
-  }
-  function isBirthdayPast() {
-    const targetDate = new Date(CONFIG.birthdayDate);
-    const now = new Date();
-    const birthdayDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate()).getTime();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    return today > birthdayDay;
-  }
-  function solveBirthdayPuzzle(event) {
-    event.preventDefault();
-    const answer = puzzleAnswer.value.trim().replace(/\s+/g, "").toLocaleUpperCase();
-    if (answer !== CONFIG.birthdayPuzzle.answer.replace(/\s+/g, "").toLocaleUpperCase()) {
-      puzzleFeedback.textContent = CONFIG.birthdayPuzzle.retryMessage;
-      puzzleAnswer.setAttribute("aria-invalid", "true");
-      puzzleAnswer.select();
-      return;
-    }
-    puzzleSolved = true;
-    puzzleAnswer.removeAttribute("aria-invalid");
-    puzzleAnswer.disabled = true;
-    puzzleSubmit.disabled = true;
-    puzzleFeedback.textContent = CONFIG.birthdayPuzzle.successMessage;
-    startButton.hidden = false;
-    startButton.textContent = CONFIG.birthdayPuzzle.unlockButton;
-    startMusicFromGesture();
   }
 
   function mediaItems() {
     return [...CONFIG.photos.map((item) => ({ ...item, kind: "image", temporary: false })), ...uploadedMedia];
   }
+  
   function renderMemories() {
     rail.replaceChildren();
     const items = mediaItems();
@@ -362,11 +325,13 @@ const CONFIG = {
       rail.append(card);
     });
   }
+  
   function animateMemories() {
     [...rail.querySelectorAll(".polaroid")].forEach((card, index) => {
       window.setTimeout(() => card.classList.add("is-arrived"), reducedMotion.matches ? 0 : index * 90);
     });
   }
+  
   function openLightbox(index, sourceCard) {
     const item = mediaItems()[index];
     if (!item) return;
@@ -395,6 +360,7 @@ const CONFIG = {
     document.body.style.overflow = "hidden";
     lightboxClose.focus();
   }
+  
   function closeLightbox() {
     if (lightbox.hidden) return;
     lightbox.classList.remove("is-open");
@@ -409,6 +375,7 @@ const CONFIG = {
       if (lightboxReturnFocus && document.contains(lightboxReturnFocus)) lightboxReturnFocus.focus();
     }, reducedMotion.matches ? 0 : 260);
   }
+  
   function acceptUploads(files) {
     uploadedMedia.forEach((item) => URL.revokeObjectURL(item.src));
     uploadedMedia = [...files].filter((file) => file.type.startsWith("image/") || file.type.startsWith("video/"))
@@ -450,6 +417,7 @@ const CONFIG = {
       typewriterInterval = window.setInterval(typeNext, 24);
     }
   }
+  
   function extinguishCandle() {
     if (flameIsOut) return;
     flameIsOut = true;
@@ -464,6 +432,7 @@ const CONFIG = {
     playSound("pop");
     burstConfetti(window.innerWidth / 2, window.innerHeight * .42, 62);
   }
+  
   function playSound(name) {
     const track = audioTracks[name];
     if (!track || isMuted || track.dataset.unavailable === "true") return;
@@ -472,12 +441,14 @@ const CONFIG = {
     }
     attemptPlay(track);
   }
+  
   function resizeCanvas() {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.floor(window.innerWidth * ratio);
     canvas.height = Math.floor(window.innerHeight * ratio);
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
   }
+  
   function burstConfetti(x, y, amount = 55) {
     const colors = ["#ffbed8", "#f6c6d6", "#ffe4a9", "#ed8bb5", "#fff1e7"];
     for (let i = 0; i < amount; i += 1) {
@@ -493,6 +464,7 @@ const CONFIG = {
     }
     requestCanvasFrame();
   }
+  
   function addFirework() {
     const x = window.innerWidth * (.14 + Math.random() * .72);
     const y = window.innerHeight * (.12 + Math.random() * .46);
@@ -506,6 +478,7 @@ const CONFIG = {
     }
     fireworks.push(burst);
   }
+  
   function drawEffects(time) {
     context.clearRect(0, 0, window.innerWidth, window.innerHeight);
     if (currentStep === totalSteps && !reducedMotion.matches) {
@@ -538,14 +511,17 @@ const CONFIG = {
     }));
     context.globalAlpha = 1;
   }
+  
   function requestCanvasFrame() {
     if (!canvasFrame) canvasFrame = requestAnimationFrame(animateCanvas);
   }
+  
   function animateCanvas(time) {
     canvasFrame = null;
     drawEffects(time);
     if (currentStep === totalSteps || particles.length || fireworks.length) canvasFrame = requestAnimationFrame(animateCanvas);
   }
+  
   function beginCelebration() {
     lastFireworkAt = 0;
     lastConfettiAt = 0;
@@ -554,6 +530,7 @@ const CONFIG = {
     burstConfetti(window.innerWidth / 2, window.innerHeight * .38, 48);
     if (!reducedMotion.matches) { addFirework(); requestCanvasFrame(); }
   }
+  
   function stopCelebration() {
     if (audioTracks.background) audioTracks.background.volume = .2;
     if (canvasFrame && currentStep !== totalSteps && !particles.length && !fireworks.length) {
@@ -561,6 +538,7 @@ const CONFIG = {
       canvasFrame = null;
     }
   }
+  
   function replay() {
     window.clearInterval(typewriterInterval);
     pauseTrack(audioTracks.celebration);
@@ -580,6 +558,7 @@ const CONFIG = {
     showStep(1);
     startMusicFromGesture();
   }
+  
   function renderAddedSteps() {
     const notes = CONFIG.loveNotes;
     $("#love-eyebrow").textContent = notes.eyebrow;
@@ -605,7 +584,6 @@ const CONFIG = {
 
   introTitle.textContent = CONFIG.introText;
   $("#intro-subtitle").textContent = CONFIG.introSubtitle;
-  $("#scrambled-word").textContent = CONFIG.birthdayPuzzle.scrambledWord;
   wishPrompt.textContent = CONFIG.wishPrompt;
   finalTitle.textContent = CONFIG.finalTitle;
   finalWish.textContent = CONFIG.finalWish;
@@ -616,7 +594,6 @@ const CONFIG = {
   countdownInterval = window.setInterval(renderCountdown, 1000);
 
   startButton.addEventListener("click", startFromBeginning);
-  birthdayPuzzle.addEventListener("submit", solveBirthdayPuzzle);
   candleButton.addEventListener("click", extinguishCandle);
   cakeNext.addEventListener("click", () => showStep(3));
   galleryNext.addEventListener("click", () => showStep(4));

@@ -507,7 +507,7 @@ h1, h2 { text-wrap: balance; }
   background: linear-gradient(110deg, #ffe8b0 9%, #f4a8c7 38%, #e6d3ff 61%, #ffe6a7 83%);
   background-size: 220% auto;
   background-clip: text;
-  color: transparent;
+  color: #f4a8c7;
   font-family: var(--display-font);
   font-size: clamp(2.7rem, 8vw, 6.5rem);
   font-weight: 400;

@@ -1,7 +1,7 @@
 kind = "web"
 previewPath = "/"
 title = "Birthday Surprise"
-description = "A mobile-first, five-step birthday surprise for Priya with a live countdown, interactive cake candle, photo memories, heartfelt message, and animated celebration."
+description = "A mobile-first, five-step birthday surprise for Simran with a live countdown, interactive cake candle, photo memories, heartfelt message, and animated celebration."
 version = "1.0.0"
 id = "artifacts/birthday-surprise"
 router = "path"
