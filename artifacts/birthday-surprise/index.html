@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111027">
+    <meta name="description" content="A little birthday surprise, made with love.">
+    <meta property="og:title" content="A Birthday Surprise">
+    <meta property="og:description" content="A little birthday surprise, made with love.">
+    <meta property="og:type" content="website">
+    <title>A Birthday Surprise</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Pacifico&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <script type="module" src="/script.js"></script>
+  </head>
+  <body>
+    <div class="sky" aria-hidden="true">
+      <div class="sky-stars"></div>
+      <div class="balloons">
+        <span class="balloon one"></span>
+        <span class="balloon two"></span>
+      </div>
+    </div>
+
+    <div class="app-shell">
+      <button class="mute-toggle" id="mute-toggle" type="button" aria-label="Mute sound" aria-pressed="false">
+        <svg class="sound-on" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M11 5 6 9H3v6h3l5 4V5Z"></path>
+          <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+          <path d="M18.5 5.5a9 9 0 0 1 0 13"></path>
+        </svg>
+        <svg class="sound-off" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M11 5 6 9H3v6h3l5 4V5Z"></path>
+          <path d="m16 9 5 6m0-6-5 6"></path>
+        </svg>
+      </button>
+
+      <canvas id="celebration-canvas" aria-hidden="true"></canvas>
+
+      <main>
+        <section class="step intro-step is-active" id="step-1" aria-labelledby="intro-title" aria-hidden="false">
+          <div class="step-inner">
+            <p class="eyebrow">A little something, just for you</p>
+            <h1 class="intro-title" id="intro-title" tabindex="-1"></h1>
+            <p class="intro-subtitle">The best day deserves a little bit of magic.</p>
+            <div class="countdown" aria-label="Birthday countdown">
+              <div class="time-unit"><span class="time-value" id="count-days">00</span><span class="time-label">Days</span></div>
+              <div class="time-unit"><span class="time-value" id="count-hours">00</span><span class="time-label">Hours</span></div>
+              <div class="time-unit"><span class="time-value" id="count-minutes">00</span><span class="time-label">Minutes</span></div>
+              <div class="time-unit"><span class="time-value" id="count-seconds">00</span><span class="time-label">Seconds</span></div>
+            </div>
+            <button class="primary-button" id="start-button" type="button">Tap to Start 🎁</button>
+            <p class="quiet-note">A small celebration, with a lot of love.</p>
+          </div>
+          <span class="step-counter" aria-hidden="true">01 / 05</span>
+        </section>
+
+        <section class="step cake-step" id="step-2" aria-labelledby="cake-title" aria-hidden="true" inert>
+          <div class="step-inner">
+            <p class="eyebrow">The moment is yours</p>
+            <h2 class="section-title" id="cake-title" tabindex="-1">One little wish</h2>
+            <p class="wish-prompt" id="wish-prompt"></p>
+            <div class="cake-stage" id="cake-stage">
+              <div class="cake-platform" aria-hidden="true"></div>
+              <div class="cake" id="cake" aria-hidden="true">
+                <div class="cake-layer bottom"><span class="icing"></span></div>
+                <div class="cake-layer middle"><span class="icing"></span></div>
+                <div class="cake-layer top"><span class="icing"></span><i class="berry b1"></i><i class="berry b2"></i><i class="berry b3"></i></div>
+              </div>
+              <button class="candle-control" id="candle-button" type="button" aria-label="Blow out the birthday candle">
+                <span class="flame" aria-hidden="true"></span>
+                <span class="smoke" aria-hidden="true"></span>
+                <span class="wick" aria-hidden="true"></span>
+                <span class="candle" aria-hidden="true"></span>
+              </button>
+            </div>
+            <p class="cake-hint" id="cake-hint">Tap the candle or blow gently into your microphone.</p>
+            <div class="cake-actions">
+              <button class="mic-button" id="mic-button" type="button" aria-pressed="false">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="2.5" width="6" height="10" rx="3"></rect><path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v3m-3 0h6"></path></svg>
+                <span id="mic-label">Use microphone</span>
+              </button>
+              <button class="next-button" id="cake-next" type="button" hidden>Next ➜</button>
+            </div>
+          </div>
+          <span class="step-counter" aria-hidden="true">02 / 05</span>
+        </section>
+
+        <section class="step memories-step" id="step-3" aria-labelledby="memories-title" aria-hidden="true" inert>
+          <div class="step-inner">
+            <p class="eyebrow">Little moments, kept close</p>
+            <h2 class="section-title" id="memories-title" tabindex="-1">A few favorite memories</h2>
+            <p class="section-subtitle">A little collection of days worth keeping.</p>
+            <div class="memory-rail" id="memory-rail" aria-label="Photo memories"></div>
+            <p class="gallery-tip">Swipe to wander through the memories.</p>
+            <div class="gallery-controls" aria-label="Gallery controls">
+              <button class="rail-arrow" id="gallery-back" type="button" aria-label="Previous memory">←</button>
+              <button class="rail-arrow" id="gallery-forward" type="button" aria-label="Next memory">→</button>
+            </div>
+            <button class="next-button gallery-next" id="gallery-next" type="button">Next ➜</button>
+          </div>
+          <span class="step-counter" aria-hidden="true">03 / 05</span>
+        </section>
+
+        <section class="step message-step" id="step-4" aria-labelledby="message-title" aria-hidden="true" inert>
+          <div class="heart-field" aria-hidden="true">
+            <span class="heart"></span><span class="heart"></span><span class="heart"></span><span class="heart"></span>
+          </div>
+          <div class="step-inner">
+            <p class="eyebrow">A note from the heart</p>
+            <article class="message-card">
+              <p class="message-kicker" id="message-title">For you, always</p>
+              <p class="typed-message" id="typed-message" aria-live="polite"></p>
+              <button class="next-button message-next" id="message-next" type="button" hidden>Next ➜</button>
+            </article>
+          </div>
+          <span class="step-counter" aria-hidden="true">04 / 05</span>
+        </section>
+
+        <section class="step final-step" id="step-5" aria-labelledby="final-title" aria-hidden="true" inert>
+          <div class="step-inner">
+            <p class="final-kicker">Today is yours</p>
+            <div class="final-ornament" aria-hidden="true">with all my love</div>
+            <h2 class="final-title" id="final-title" tabindex="-1"></h2>
+            <p class="final-wish" id="final-wish"></p>
+            <button class="primary-button replay-button" id="replay-button" type="button">Replay 🔁</button>
+          </div>
+          <span class="step-counter" aria-hidden="true">05 / 05</span>
+        </section>
+      </main>
+    </div>
+
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightbox-caption" aria-hidden="true">
+      <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close photo">×</button>
+      <div class="lightbox-content">
+        <div class="lightbox-image-frame" id="lightbox-frame"><img id="lightbox-image" alt=""></div>
+        <p class="lightbox-caption" id="lightbox-caption"></p>
+      </div>
+    </div>
+  </body>
+</html>
