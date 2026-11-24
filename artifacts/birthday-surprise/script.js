@@ -1,11 +1,9 @@
 const CONFIG = {
   // Personalize every line here; the site remains a self-contained static experience.
   name: "Simran",
-  birthdayDate: "2026-10-25T00:00:00",
   introText: "Something special is waiting for Simran...",
   introSubtitle: "The best day deserves a little bit of magic.",
   birthdayTodaySubtitle: "It's your birthday today. Your surprise is ready whenever you are.",
-  birthdayPassedSubtitle: "The date has passed, but your birthday surprise is still here.",
   wishPrompt: "Make a wish, then tap the candle.",
   candleRevealText: "One wish made. One wonderful year ahead.",
   photos: [
@@ -47,6 +45,14 @@ const CONFIG = {
   }
 };
 
+// Countdown settings (month: 0 = Jan ... 10 = Nov, 11 = Dec)
+const COUNTDOWN = {
+  year: 2026,
+  month: 10,
+  day: 25,
+  testMode: false // true = 15 sec countdown, then celebration, hidden after 1 min
+};
+
 (() => {
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -77,7 +83,7 @@ const CONFIG = {
   const canvas = $("#celebration-canvas");
   const context = canvas.getContext("2d");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  
+
   const placeholderColors = [
     "linear-gradient(145deg, #ffd9e6, #f6a5c7)",
     "linear-gradient(145deg, #ffe6a9, #f2a9bb)",
@@ -85,7 +91,7 @@ const CONFIG = {
     "linear-gradient(145deg, #f6c5d4, #f39c9d)",
     "linear-gradient(145deg, #f5d8a7, #ec9ebc)"
   ];
-  
+
   let currentStep = 1;
   let countdownInterval;
   let typewriterInterval;
@@ -103,7 +109,7 @@ const CONFIG = {
   let melodyStarted = false;
   let melodyIndex = 0;
   let nextNoteAt = 0;
-  
+
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const melody = [
     [392, .27], [392, .27], [440, .54], [392, .54], [523.25, .54], [493.88, 1.05],
@@ -111,7 +117,7 @@ const CONFIG = {
     [392, .27], [392, .27], [783.99, .54], [659.25, .54], [523.25, .54], [493.88, .54], [440, 1.05],
     [698.46, .27], [698.46, .27], [659.25, .54], [523.25, .54], [587.33, .54], [523.25, 1.1]
   ];
-  
+
   const audioTracks = {};
   Object.entries(CONFIG.sounds || {}).forEach(([key, source]) => {
     if (!source) return;
@@ -199,48 +205,181 @@ const CONFIG = {
     pauseTrack(audioTracks.background);
   }
 
+  // ================= COUNTDOWN (merged from countdown.js) =================
+
+  // Countdown ends at 25 Nov 00:00
+  const startTime = COUNTDOWN.testMode
+    ? new Date(Date.now() + 15000)
+    : new Date(COUNTDOWN.year, COUNTDOWN.month, COUNTDOWN.day, 0, 0, 0);
+
+  // Everything disappears at 26 Nov 00:00
+  const endTime = COUNTDOWN.testMode
+    ? new Date(Date.now() + 60000)
+    : new Date(COUNTDOWN.year, COUNTDOWN.month, COUNTDOWN.day + 1, 0, 0, 0);
+
+  // CSS rules that decide what shows in each state
+  const countdownStyle = document.createElement("style");
+  countdownStyle.textContent = `
+    body.state-countdown #countdown { display: flex !important; }
+    body.state-countdown #start-button { display: none !important; }
+
+    body.state-start #countdown { display: none !important; }
+    body.state-start #start-button { display: inline-block !important; }
+
+    body.state-over .app-shell,
+    body.state-over .sky,
+    body.state-over .lightbox { display: none !important; }
+
+    #party-canvas {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 99999;
+    }
+  `;
+  document.head.appendChild(countdownStyle);
+
+  // Celebration (confetti + hearts) when the time is complete
+  let celebrating = false;
+
+  function celebrate() {
+    if (celebrating) return;
+    if (reducedMotion.matches) return;
+    celebrating = true;
+
+    const partyCanvas = document.createElement("canvas");
+    partyCanvas.id = "party-canvas";
+    document.body.appendChild(partyCanvas);
+    const ctx = partyCanvas.getContext("2d");
+
+    const resize = () => {
+      partyCanvas.width = window.innerWidth;
+      partyCanvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const colors = ["#f58db7", "#ffd166", "#8ecae6", "#b8f2e6", "#ff6b9d", "#c9a7ff"];
+    const pieces = [];
+
+    function burst(x, y, count) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 4 + Math.random() * 9;
+        pieces.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 5,
+          size: 6 + Math.random() * 8,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rot: Math.random() * Math.PI,
+          vr: (Math.random() - 0.5) * 0.3,
+          heart: Math.random() < 0.25
+        });
+      }
+    }
+
+    function drawHeart(size) {
+      const s = size / 2;
+      ctx.beginPath();
+      ctx.moveTo(0, s * 0.6);
+      ctx.bezierCurveTo(-s * 1.4, -s * 0.4, -s * 0.5, -s * 1.3, 0, -s * 0.4);
+      ctx.bezierCurveTo(s * 0.5, -s * 1.3, s * 1.4, -s * 0.4, 0, s * 0.6);
+      ctx.fill();
+    }
+
+    const w = partyCanvas.width, h = partyCanvas.height;
+    burst(w * 0.5, h * 0.4, 120);
+    setTimeout(() => burst(w * 0.2, h * 0.5, 80), 500);
+    setTimeout(() => burst(w * 0.8, h * 0.5, 80), 900);
+    setTimeout(() => burst(w * 0.5, h * 0.3, 100), 1600);
+    setTimeout(() => burst(w * 0.3, h * 0.4, 70), 2400);
+    setTimeout(() => burst(w * 0.7, h * 0.4, 70), 3000);
+
+    const startedAt = performance.now();
+
+    function frame(now) {
+      ctx.clearRect(0, 0, partyCanvas.width, partyCanvas.height);
+
+      for (let i = pieces.length - 1; i >= 0; i--) {
+        const p = pieces[i];
+        p.vy += 0.18;
+        p.vx *= 0.99;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+
+        if (p.y > partyCanvas.height + 30) {
+          pieces.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        if (p.heart) drawHeart(p.size * 1.6);
+        else ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+        ctx.restore();
+      }
+
+      if (now - startedAt < 4500 || pieces.length > 0) {
+        requestAnimationFrame(frame);
+      } else {
+        window.removeEventListener("resize", resize);
+        partyCanvas.remove();
+        celebrating = false;
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  const pad = (n) => String(n).padStart(2, "0");
+  let currentState = null;
+
+  function setState(name) {
+    if (name === currentState) return;
+    currentState = name;
+
+    document.body.classList.remove("state-countdown", "state-start", "state-over");
+    document.body.classList.add(name);
+
+    const subtitle = $("#intro-subtitle");
+    if (name === "state-start") {
+      if (subtitle) subtitle.textContent = CONFIG.birthdayTodaySubtitle;
+      celebrate();
+    } else if (name === "state-countdown") {
+      if (subtitle) subtitle.textContent = CONFIG.introSubtitle;
+    }
+  }
+
   function renderCountdown() {
-    const targetDate = new Date(CONFIG.birthdayDate);
     const now = new Date();
-    const countdown = $("#countdown");
-    const introSubtitle = $("#intro-subtitle");
-    const birthdayDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate()).getTime();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
-    if (today === birthdayDay) {
-      countdown.hidden = true;
-      startButton.hidden = false;
-      startButton.textContent = "Tap to Start";
-      introSubtitle.textContent = CONFIG.birthdayTodaySubtitle;
+    if (now >= endTime) {
+      setState("state-over");
       return;
     }
 
-    if (today > birthdayDay) {
-      countdown.hidden = true;
-      startButton.hidden = false;
-      startButton.textContent = "Tap to Start";
-      introSubtitle.textContent = CONFIG.birthdayPassedSubtitle;
+    if (now >= startTime) {
+      setState("state-start");
       return;
     }
 
-    countdown.hidden = false;
-    startButton.hidden = false;
-    startButton.textContent = "Tap to Start";
-    introSubtitle.textContent = CONFIG.introSubtitle;
-    const remaining = Math.max(0, targetDate.getTime() - now.getTime());
-    const seconds = Math.floor(remaining / 1000);
+    setState("state-countdown");
+    const total = Math.floor((startTime - now) / 1000);
     const values = {
-      days: Math.floor(seconds / 86400),
-      hours: Math.floor((seconds % 86400) / 3600),
-      minutes: Math.floor((seconds % 3600) / 60),
-      seconds: seconds % 60
+      days: Math.floor(total / 86400),
+      hours: Math.floor((total % 86400) / 3600),
+      minutes: Math.floor((total % 3600) / 60),
+      seconds: total % 60
     };
     Object.entries(values).forEach(([key, value]) => {
       const output = $(`#count-${key}`);
-      if (output) output.textContent = String(value).padStart(2, "0");
+      if (output) output.textContent = pad(value);
     });
   }
-  
+
+  // ================= END COUNTDOWN =================
+
   function showStep(number) {
     if (number < 1 || number > totalSteps) return;
     currentStep = number;
@@ -259,7 +398,7 @@ const CONFIG = {
     if (number === totalSteps) beginCelebration();
     else stopCelebration();
   }
-  
+
   function startFromBeginning() {
     startMusicFromGesture();
     if (currentStep === 1) showStep(2);
@@ -268,7 +407,7 @@ const CONFIG = {
   function mediaItems() {
     return [...CONFIG.photos.map((item) => ({ ...item, kind: "image", temporary: false })), ...uploadedMedia];
   }
-  
+
   function renderMemories() {
     rail.replaceChildren();
     const items = mediaItems();
@@ -325,13 +464,13 @@ const CONFIG = {
       rail.append(card);
     });
   }
-  
+
   function animateMemories() {
     [...rail.querySelectorAll(".polaroid")].forEach((card, index) => {
       window.setTimeout(() => card.classList.add("is-arrived"), reducedMotion.matches ? 0 : index * 90);
     });
   }
-  
+
   function openLightbox(index, sourceCard) {
     const item = mediaItems()[index];
     if (!item) return;
@@ -360,7 +499,7 @@ const CONFIG = {
     document.body.style.overflow = "hidden";
     lightboxClose.focus();
   }
-  
+
   function closeLightbox() {
     if (lightbox.hidden) return;
     lightbox.classList.remove("is-open");
@@ -375,7 +514,7 @@ const CONFIG = {
       if (lightboxReturnFocus && document.contains(lightboxReturnFocus)) lightboxReturnFocus.focus();
     }, reducedMotion.matches ? 0 : 260);
   }
-  
+
   function acceptUploads(files) {
     uploadedMedia.forEach((item) => URL.revokeObjectURL(item.src));
     uploadedMedia = [...files].filter((file) => file.type.startsWith("image/") || file.type.startsWith("video/"))
@@ -417,7 +556,7 @@ const CONFIG = {
       typewriterInterval = window.setInterval(typeNext, 24);
     }
   }
-  
+
   function extinguishCandle() {
     if (flameIsOut) return;
     flameIsOut = true;
@@ -432,7 +571,7 @@ const CONFIG = {
     playSound("pop");
     burstConfetti(window.innerWidth / 2, window.innerHeight * .42, 62);
   }
-  
+
   function playSound(name) {
     const track = audioTracks[name];
     if (!track || isMuted || track.dataset.unavailable === "true") return;
@@ -441,14 +580,14 @@ const CONFIG = {
     }
     attemptPlay(track);
   }
-  
+
   function resizeCanvas() {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.floor(window.innerWidth * ratio);
     canvas.height = Math.floor(window.innerHeight * ratio);
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
   }
-  
+
   function burstConfetti(x, y, amount = 55) {
     const colors = ["#ffbed8", "#f6c6d6", "#ffe4a9", "#ed8bb5", "#fff1e7"];
     for (let i = 0; i < amount; i += 1) {
@@ -464,7 +603,7 @@ const CONFIG = {
     }
     requestCanvasFrame();
   }
-  
+
   function addFirework() {
     const x = window.innerWidth * (.14 + Math.random() * .72);
     const y = window.innerHeight * (.12 + Math.random() * .46);
@@ -478,7 +617,7 @@ const CONFIG = {
     }
     fireworks.push(burst);
   }
-  
+
   function drawEffects(time) {
     context.clearRect(0, 0, window.innerWidth, window.innerHeight);
     if (currentStep === totalSteps && !reducedMotion.matches) {
@@ -511,17 +650,17 @@ const CONFIG = {
     }));
     context.globalAlpha = 1;
   }
-  
+
   function requestCanvasFrame() {
     if (!canvasFrame) canvasFrame = requestAnimationFrame(animateCanvas);
   }
-  
+
   function animateCanvas(time) {
     canvasFrame = null;
     drawEffects(time);
     if (currentStep === totalSteps || particles.length || fireworks.length) canvasFrame = requestAnimationFrame(animateCanvas);
   }
-  
+
   function beginCelebration() {
     lastFireworkAt = 0;
     lastConfettiAt = 0;
@@ -530,7 +669,7 @@ const CONFIG = {
     burstConfetti(window.innerWidth / 2, window.innerHeight * .38, 48);
     if (!reducedMotion.matches) { addFirework(); requestCanvasFrame(); }
   }
-  
+
   function stopCelebration() {
     if (audioTracks.background) audioTracks.background.volume = .2;
     if (canvasFrame && currentStep !== totalSteps && !particles.length && !fireworks.length) {
@@ -538,7 +677,7 @@ const CONFIG = {
       canvasFrame = null;
     }
   }
-  
+
   function replay() {
     window.clearInterval(typewriterInterval);
     pauseTrack(audioTracks.celebration);
@@ -558,7 +697,7 @@ const CONFIG = {
     showStep(1);
     startMusicFromGesture();
   }
-  
+
   function renderAddedSteps() {
     const notes = CONFIG.loveNotes;
     $("#love-eyebrow").textContent = notes.eyebrow;
