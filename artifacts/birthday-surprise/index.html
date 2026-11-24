@@ -57,14 +57,26 @@
             <p class="eyebrow">A little something, just for you</p>
             <h1 class="intro-title" id="intro-title" tabindex="-1"></h1>
             <p class="intro-subtitle" id="intro-subtitle">The best day deserves a little bit of magic.</p>
-            <div class="countdown" aria-label="Birthday countdown">
+            <div class="countdown" id="countdown" aria-label="Birthday countdown">
               <div class="time-unit"><span class="time-value" id="count-days">00</span><span class="time-label">Days</span></div>
               <div class="time-unit"><span class="time-value" id="count-hours">00</span><span class="time-label">Hours</span></div>
               <div class="time-unit"><span class="time-value" id="count-minutes">00</span><span class="time-label">Minutes</span></div>
               <div class="time-unit"><span class="time-value" id="count-seconds">00</span><span class="time-label">Seconds</span></div>
             </div>
+            <form class="birthday-puzzle" id="birthday-puzzle" hidden>
+              <p class="puzzle-kicker">A little birthday puzzle</p>
+              <h2 class="puzzle-title">Unscramble the word</h2>
+              <p class="puzzle-instructions">Solve this birthday word to unlock the surprise.</p>
+              <p class="scrambled-word" id="scrambled-word"></p>
+              <label class="puzzle-label" for="puzzle-answer">Your answer</label>
+              <div class="puzzle-controls">
+                <input id="puzzle-answer" name="answer" type="text" autocomplete="off" autocapitalize="none" required>
+                <button class="puzzle-submit" id="puzzle-submit" type="submit">Check answer</button>
+              </div>
+              <p class="puzzle-feedback" id="puzzle-feedback" role="status" aria-live="polite"></p>
+            </form>
             <button class="primary-button" id="start-button" type="button">Tap to Start</button>
-            <p class="quiet-note">A small celebration, with a lot of love.</p>
+            <p class="quiet-note">Turn your volume up, then tap to start the birthday tune.</p>
           </div>
           <span class="step-counter" aria-hidden="true">01 / 07</span>
         </section>
@@ -88,7 +100,8 @@
                 <span class="candle" aria-hidden="true"></span>
               </button>
             </div>
-          <p class="cake-hint" id="cake-hint">Tap the candle to make your wish.</p>
+            <p class="cake-reveal" id="cake-reveal" hidden></p>
+            <p class="cake-hint" id="cake-hint">Tap the candle to make your wish.</p>
             <div class="cake-actions">
               <button class="next-button" id="cake-next" type="button" hidden>Next ➜</button>
             </div>

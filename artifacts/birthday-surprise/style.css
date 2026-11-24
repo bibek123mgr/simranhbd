@@ -172,6 +172,84 @@ h1, h2 { text-wrap: balance; }
   gap: clamp(9px, 2.4vw, 25px);
   margin: 0 auto 35px;
 }
+.countdown[hidden] { display: none; }
+.birthday-puzzle[hidden] { display: none; }
+.birthday-puzzle {
+  width: min(100%, 490px);
+  margin: 0 auto 26px;
+  padding: 22px 24px;
+  border: 1px solid rgba(192, 83, 127, .2);
+  border-radius: 22px;
+  background: rgba(255, 251, 250, .8);
+  box-shadow: 0 16px 36px rgba(174, 78, 117, .1);
+}
+.puzzle-kicker {
+  margin-bottom: 8px;
+  color: #b64875;
+  font-size: .62rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.puzzle-title {
+  margin-bottom: 7px;
+  color: #79334f;
+  font-family: var(--display-font);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 400;
+}
+.puzzle-instructions { margin-bottom: 16px; color: #805a6a; font-size: .8rem; }
+.scrambled-word {
+  display: inline-block;
+  margin: 0 auto 15px;
+  padding: 8px 18px;
+  border: 1px dashed rgba(184, 66, 116, .4);
+  border-radius: 12px;
+  color: #a63f6b;
+  background: #fff2f6;
+  font-size: clamp(1.25rem, 4vw, 1.8rem);
+  font-weight: 700;
+  letter-spacing: .24em;
+}
+.puzzle-label { display: block; margin-bottom: 7px; color: #805a6a; font-size: .7rem; font-weight: 600; }
+.puzzle-controls { display: flex; justify-content: center; gap: 8px; }
+.puzzle-controls input {
+  min-width: 0;
+  width: 175px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(184, 66, 116, .28);
+  border-radius: 12px;
+  color: #60394a;
+  background: #fff;
+  font: inherit;
+}
+.puzzle-controls input[aria-invalid="true"] { border-color: #c9486b; }
+.puzzle-submit {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 12px;
+  color: #fffaf8;
+  background: #cf4f84;
+  font: 600 .72rem var(--body-font);
+  cursor: pointer;
+}
+.puzzle-submit:disabled { opacity: .6; cursor: default; }
+.puzzle-feedback { min-height: 1.4em; margin: 9px 0 0; color: #9b4267; font-size: .7rem; }
+.cake-reveal[hidden] { display: none; }
+.cake-reveal {
+  width: fit-content;
+  max-width: min(100% - 28px, 430px);
+  margin: 0 auto 10px;
+  padding: 10px 18px;
+  border: 1px solid rgba(192, 83, 127, .18);
+  border-radius: 999px;
+  color: #8a3e5e;
+  background: rgba(255, 251, 250, .86);
+  box-shadow: 0 10px 26px rgba(174, 78, 117, .08);
+  font-size: .82rem;
+}
 .time-unit {
   display: flex;
   width: clamp(68px, 14vw, 108px);

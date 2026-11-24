@@ -1,10 +1,20 @@
 const CONFIG = {
   // Personalize every line here; the site remains a self-contained static experience.
   name: "Priya",
-  birthdayDate: "2026-12-15T00:00:00",
+  birthdayDate: "2026-10-25T00:00:00",
   introText: "Something special is waiting for Priya...",
   introSubtitle: "The best day deserves a little bit of magic.",
+  birthdayTodaySubtitle: "It's your birthday today. Your surprise is ready whenever you are.",
+  birthdayPassedSubtitle: "The date has passed, but your birthday surprise is still here.",
+  birthdayPuzzle: {
+    scrambledWord: "YADHTRIB",
+    answer: "BIRTHDAY",
+    retryMessage: "Not quite. Try rearranging the letters.",
+    successMessage: "You solved it. Your surprise is ready!",
+    unlockButton: "Open your surprise"
+  },
   wishPrompt: "Make a wish, then tap the candle.",
+  candleRevealText: "One wish made. One wonderful year ahead.",
   photos: [
     { src: "images/photo1.jpg", caption: "Our first trip together" },
     { src: "images/photo2.jpg", caption: "That crazy night out" },
@@ -38,11 +48,12 @@ const CONFIG = {
   },
   finalTitle: "Happy Birthday Priya!",
   finalWish: "May all your wishes come true. Keep shining, keep smiling, and never stop being you. Love you always!",
-  // Optional local effects only. The birthday melody is synthesized if no audio file works.
+  // Leave background empty to use the built-in Happy Birthday melody.
+  // Add an audio file path here only if you want to replace that melody.
   sounds: {
-    background: "audio/birthday.mp3",
-    pop: "audio/pop.mp3",
-    celebration: "audio/celebration.mp3"
+    background: "",
+    pop: "",
+    celebration: ""
   }
 };
 
@@ -56,6 +67,10 @@ const CONFIG = {
   const finalTitle = $("#final-title");
   const finalWish = $("#final-wish");
   const startButton = $("#start-button");
+  const birthdayPuzzle = $("#birthday-puzzle");
+  const puzzleAnswer = $("#puzzle-answer");
+  const puzzleSubmit = $("#puzzle-submit");
+  const puzzleFeedback = $("#puzzle-feedback");
   const cakeStage = $("#cake-stage");
   const candleButton = $("#candle-button");
   const cake = $("#cake");
@@ -88,6 +103,7 @@ const CONFIG = {
   let typewriterInterval;
   let isMuted = false;
   let flameIsOut = false;
+  let puzzleSolved = false;
   let lightboxReturnFocus = null;
   let canvasFrame = null;
   let lastFireworkAt = 0;
@@ -139,7 +155,7 @@ const CONFIG = {
     oscillator.type = "sine";
     oscillator.frequency.setValueAtTime(frequency, startAt);
     gain.gain.setValueAtTime(.0001, startAt);
-    gain.gain.exponentialRampToValueAtTime(.038, startAt + .025);
+    gain.gain.exponentialRampToValueAtTime(.12, startAt + .025);
     gain.gain.exponentialRampToValueAtTime(.0001, startAt + duration * .88);
     oscillator.connect(gain);
     gain.connect(audioContext.destination);
@@ -195,8 +211,37 @@ const CONFIG = {
   }
 
   function renderCountdown() {
-    const target = new Date(CONFIG.birthdayDate).getTime();
-    const remaining = Math.max(0, target - Date.now());
+    const targetDate = new Date(CONFIG.birthdayDate);
+    const now = new Date();
+    const countdown = $("#countdown");
+    const introSubtitle = $("#intro-subtitle");
+    const birthdayDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate()).getTime();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+    if (today === birthdayDay) {
+      countdown.hidden = true;
+      birthdayPuzzle.hidden = true;
+      startButton.hidden = false;
+      startButton.textContent = "Tap to Start";
+      introSubtitle.textContent = CONFIG.birthdayTodaySubtitle;
+      return;
+    }
+
+    if (today > birthdayDay) {
+      countdown.hidden = true;
+      birthdayPuzzle.hidden = false;
+      startButton.hidden = !puzzleSolved;
+      startButton.textContent = CONFIG.birthdayPuzzle.unlockButton;
+      introSubtitle.textContent = CONFIG.birthdayPassedSubtitle;
+      return;
+    }
+
+    countdown.hidden = false;
+    birthdayPuzzle.hidden = true;
+    startButton.hidden = false;
+    startButton.textContent = "Tap to Start";
+    introSubtitle.textContent = CONFIG.introSubtitle;
+    const remaining = Math.max(0, targetDate.getTime() - now.getTime());
     const seconds = Math.floor(remaining / 1000);
     const values = {
       days: Math.floor(seconds / 86400),
@@ -208,10 +253,6 @@ const CONFIG = {
       const output = $(`#count-${key}`);
       if (output) output.textContent = String(value).padStart(2, "0");
     });
-    if (remaining === 0 && currentStep === 1) {
-      window.clearInterval(countdownInterval);
-      window.setTimeout(() => { if (currentStep === 1) showStep(2); }, 900);
-    }
   }
   function showStep(number) {
     if (number < 1 || number > totalSteps) return;
@@ -232,8 +273,34 @@ const CONFIG = {
     else stopCelebration();
   }
   function startFromBeginning() {
+    if (isBirthdayPast() && !puzzleSolved) return;
     startMusicFromGesture();
     if (currentStep === 1) showStep(2);
+  }
+  function isBirthdayPast() {
+    const targetDate = new Date(CONFIG.birthdayDate);
+    const now = new Date();
+    const birthdayDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate()).getTime();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    return today > birthdayDay;
+  }
+  function solveBirthdayPuzzle(event) {
+    event.preventDefault();
+    const answer = puzzleAnswer.value.trim().replace(/\s+/g, "").toLocaleUpperCase();
+    if (answer !== CONFIG.birthdayPuzzle.answer.replace(/\s+/g, "").toLocaleUpperCase()) {
+      puzzleFeedback.textContent = CONFIG.birthdayPuzzle.retryMessage;
+      puzzleAnswer.setAttribute("aria-invalid", "true");
+      puzzleAnswer.select();
+      return;
+    }
+    puzzleSolved = true;
+    puzzleAnswer.removeAttribute("aria-invalid");
+    puzzleAnswer.disabled = true;
+    puzzleSubmit.disabled = true;
+    puzzleFeedback.textContent = CONFIG.birthdayPuzzle.successMessage;
+    startButton.hidden = false;
+    startButton.textContent = CONFIG.birthdayPuzzle.unlockButton;
+    startMusicFromGesture();
   }
 
   function mediaItems() {
@@ -391,6 +458,8 @@ const CONFIG = {
     void cake.offsetWidth;
     cake.classList.add("is-bouncing");
     cakeNext.hidden = false;
+    $("#cake-reveal").hidden = false;
+    $("#cake-reveal").textContent = CONFIG.candleRevealText;
     cakeHint.textContent = "Wish made. Keep it close.";
     playSound("pop");
     burstConfetti(window.innerWidth / 2, window.innerHeight * .42, 62);
@@ -503,6 +572,7 @@ const CONFIG = {
     cakeStage.classList.remove("is-out");
     cake.classList.remove("is-bouncing");
     cakeNext.hidden = true;
+    $("#cake-reveal").hidden = true;
     cakeHint.textContent = "Tap the candle to make your wish.";
     rail.querySelectorAll(".polaroid").forEach((card) => card.classList.remove("is-arrived"));
     messageNext.hidden = true;
@@ -535,6 +605,7 @@ const CONFIG = {
 
   introTitle.textContent = CONFIG.introText;
   $("#intro-subtitle").textContent = CONFIG.introSubtitle;
+  $("#scrambled-word").textContent = CONFIG.birthdayPuzzle.scrambledWord;
   wishPrompt.textContent = CONFIG.wishPrompt;
   finalTitle.textContent = CONFIG.finalTitle;
   finalWish.textContent = CONFIG.finalWish;
@@ -545,6 +616,7 @@ const CONFIG = {
   countdownInterval = window.setInterval(renderCountdown, 1000);
 
   startButton.addEventListener("click", startFromBeginning);
+  birthdayPuzzle.addEventListener("submit", solveBirthdayPuzzle);
   candleButton.addEventListener("click", extinguishCandle);
   cakeNext.addEventListener("click", () => showStep(3));
   galleryNext.addEventListener("click", () => showStep(4));
